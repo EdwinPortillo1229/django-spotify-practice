@@ -23,7 +23,6 @@ sp = spotipy.SpotifyOAuth(client_id=SPOTIPY_CLIENT_ID, client_secret=SPOTIPY_CLI
 def search_for_song(song_title, artist_name, user):
     spot = spotipy.Spotify(auth=user.access_token)
     search_results = spot.search(q=f"track:{song_title} artist:{artist_name}", type='track', limit=1)
-    print(f"\n\nsearching for {song_title} by {artist_name}, this is search results: {search_results}\n\n")
     if search_results['tracks']['items']:
         return search_results['tracks']['items'][0]['uri']
     else:
@@ -37,11 +36,14 @@ def create_the_playlist(songs_arr, user, vibe, artists):
     playlist = spot.user_playlist_create(user_id, playlist_name, public=True, description=playlist_desc)
     playlist_id = playlist['id']
     track_ids = []
+    successful_songs = []
     for song in songs_arr:
         track_id = search_for_song(song[0], song[1], user)
         if track_id:
             track_ids.append(track_id)
+            successful_songs.append(song)
     spot.user_playlist_add_tracks(user_id, playlist_id, track_ids)
+    return successful_songs
 
 
 def connect_to_spotify(request):
@@ -54,7 +56,6 @@ def spotify_set_user(request):
     access_token = token_info['access_token']
     spot = spotipy.Spotify(auth=access_token)
     user_info = spot.me()
-    print(user_info)
 
     user, created = SpotifyUser.objects.get_or_create(
         spotify_id=user_info['id'],
@@ -109,7 +110,8 @@ def create_inquiry(request, user_pk):
                     f"'{artist2}', and '{artist3}'. "
                     f"Don't just give me their most popular songs, and make sure they match the vibe of '{vibe}' "
                     f"for the last time, please give me 15 songs in an array within a string. "
-                    f"dont convert to json to anything. straight up array within a string so i can convert the string to array")
+                    f"dont convert to json to anything. straight up array within a string so i can convert the string to array"
+                    f"no matter what. do not reply with anything else. just the array. ")
 
                 response = client.chat.completions.create(
                     messages=[
@@ -121,12 +123,13 @@ def create_inquiry(request, user_pk):
                     model="gpt-4",
                 )                
                 generated_text = response.choices[0].message.content
+                print(f"\n\n\n this is the generate text{generated_text} \n\n\n")
                 data_str = generated_text.strip('"')
                 songs = ast.literal_eval(data_str)
 
-                create_the_playlist(songs, user, vibe, [artist1, artist2, artist3])
+                successful_songs = create_the_playlist(songs, user, vibe, [artist1, artist2, artist3])
 
-                for song in songs:
+                for song in successful_songs:
                     song = Song(
                         song_title = song[0],
                         artist_name = song[1],
