@@ -45,7 +45,8 @@ def create_inquiry(request):
                     f"['Starboy', 'The Weeknd']]. Please please please only give me the array, nothing else. "
                     f"Now chosen vibe is '{vibe}' and the three artists are '{artist1}', "
                     f"'{artist2}', and '{artist3}'. "
-                    f"Don't just give me their most popular songs, and make sure they match the vibe of 'upbeat'")
+                    f"Don't just give me their most popular songs, and make sure they match the vibe of '{vibe}' "
+                    f"for the last time, please give me 15 songs in an array within a string. dont convert to json to anything. straight up array within a string so i can convert the string to array")
 
                 response = client.chat.completions.create(
                     messages=[
@@ -54,10 +55,11 @@ def create_inquiry(request):
                             "content": prompt,
                         }
                     ],
-                    model="gpt-3.5-turbo",
+                    model="gpt-4",
                 )                
                 generated_text = response.choices[0].message.content
-                songs = ast.literal_eval(generated_text)
+                data_str = generated_text.strip('"')
+                songs = ast.literal_eval(data_str)
 
                 for song in songs:
                     song = Song(
