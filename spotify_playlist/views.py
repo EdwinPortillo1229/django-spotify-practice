@@ -3,7 +3,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import InquiryForm
 from .models import Inquiry
+from .models import Song
 from django.utils import timezone
+
+artist_names = ["Artist1", "Artist2", "Artist3", "Artist4", "Artist5", "Artist6", "Artist7", "Artist8", "Artist9", "Artist10", "Artist11", "Artist12", "Artist13", "Artist14", "Artist15"]
+song_titles = ["Song1", "Song2", "Song3", "Song4", "Song5", "Song6", "Song7", "Song8", "Song9", "Song10", "Song11", "Song12", "Song13", "Song14", "Song15"]
 
 def create_inquiry(request):
         if request.method == 'POST':
@@ -19,6 +23,15 @@ def create_inquiry(request):
                 )
                 inquiry.save()
 
+                # Create Song instances using form data
+                for i in range(15):
+                    song = Song(
+                        song_title = song_titles[i],
+                        artist_name = artist_names[i],
+                        inquiry = inquiry
+                    )
+                    song.save()
+
                 # Redirect to a success page or another view
                 return redirect('inquiries_index')
         else:
@@ -32,4 +45,5 @@ def inquiries_index(request):
 
 def inquiry_detail(request, pk):
     inquiry = get_object_or_404(Inquiry, pk=pk)
-    return render(request, 'spotify_playlist/inquiry_detail.html', {'inquiry': inquiry})
+    songs = Song.objects.filter(inquiry=inquiry)
+    return render(request, 'spotify_playlist/inquiry_detail.html', {'inquiry': inquiry, 'songs': songs})

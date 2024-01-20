@@ -3,4 +3,9 @@
 <p> Artist 2: {{inquiry.artist2}}</p>
 <p> Artist 3: {{inquiry.artist3}}</p>
 
+<h3>Songs:</h3>
+{% for song in songs %}
+    <p>{{song.song_title}} by {{song.artist_name}}</p>
+{% endfor %}
+
 <a href="{% url 'inquiries_index' %}">Go back</button>
