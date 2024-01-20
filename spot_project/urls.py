@@ -5,5 +5,5 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('spotify_playlist/', include('spotify_playlist.urls')),
+    path('', include('spotify_playlist.urls')),  # Include the app's URLs with an empty path
 ]
