@@ -21,6 +21,28 @@ SPOTIPY_CLIENT_SECRET = '6e176a0e9f4342d7aa9358d016111fa9'
 SPOTIPY_REDIRECT_URI = 'http://127.0.0.1:8000/spotify_set_user/'
 sp = spotipy.SpotifyOAuth(client_id=SPOTIPY_CLIENT_ID, client_secret=SPOTIPY_CLIENT_SECRET, redirect_uri=SPOTIPY_REDIRECT_URI, scope="playlist-modify-public playlist-modify-private")
 
+def search_for_song(song_title, artist_name, user):
+    spot = spotipy.Spotify(auth=user.access_token)
+    search_results = spot.search(q=f'track:{song_title} artist:{artist_name}', type='track', limit=1)
+    if search_results['tracks']['items']:
+        return search_results['tracks']['items'][0]['id']
+    else:
+        return None
+
+def create_the_playlist(songs_arr, user, vibe, artists):
+    spot = spotipy.Spotify(auth=user.access_token)
+    playlist_name = f"{artists[0]}, {artists[1]}, {artists[2]} - {vibe}"
+    playlist_desc = "Django practice project."
+    user_id = user.id
+    playlist = spot.user_playlist_create(user_id, playlist_name, public=True, description=playlist_desc)
+    playlist_id = playlist['id']
+    track_ids = []
+    for song in songs_arr:
+        track_id = search_for_song(song[0], song[1], user)
+        if track_id:
+            track_ids.append(track_id)
+    spot.user_playlist_add_tracks(user_id, playlist_id, track_ids)
+
 
 def connect_to_spotify(request):
     auth_url = sp.get_authorize_url()
@@ -100,6 +122,8 @@ def create_inquiry(request, user_pk):
                 generated_text = response.choices[0].message.content
                 data_str = generated_text.strip('"')
                 songs = ast.literal_eval(data_str)
+
+                playlist_creation_response = create_the_playlist(songs, user, vibe, [artist1, artist2, artist3])
 
                 for song in songs:
                     song = Song(
