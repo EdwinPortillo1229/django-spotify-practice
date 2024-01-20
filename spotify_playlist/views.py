@@ -4,6 +4,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .forms import InquiryForm
 from .models import Inquiry
 from .models import Song
+from .models import SpotifyUser
 from django.utils import timezone
 from openai import OpenAI
 import spotipy
@@ -17,10 +18,11 @@ client = OpenAI(
 # Set up your Spotify app credentials
 SPOTIPY_CLIENT_ID = 'ddeddc01708d4387a7e10aff1a62b065'
 SPOTIPY_CLIENT_SECRET = '285a252875b8496bbd6664514aab9b60'
-SPOTIPY_REDIRECT_URI = 'http://127.0.0.1:8000/inquiries_index/'
+SPOTIPY_REDIRECT_URI = 'http://127.0.0.1:8000/spotify_set_user/'
+sp = spotipy.SpotifyOAuth(client_id=SPOTIPY_CLIENT_ID, client_secret=SPOTIPY_CLIENT_SECRET, redirect_uri=SPOTIPY_REDIRECT_URI, scope="playlist-modify-public playlist-modify-private")
+
 
 def connect_to_spotify(request):
-    sp = spotipy.SpotifyOAuth(client_id=SPOTIPY_CLIENT_ID, client_secret=SPOTIPY_CLIENT_SECRET, redirect_uri=SPOTIPY_REDIRECT_URI, scope="playlist-modify-public playlist-modify-private")
     auth_url = sp.get_authorize_url()
     return render(request, 'spotify_playlist/connect_to_spotify.html', {'auth_url': auth_url})
 
@@ -87,9 +89,21 @@ def create_inquiry(request):
 
         return render(request, 'spotify_playlist/create_inquiry.html', {'form': form})
 
-def inquiries_index(request):
-    inquiries = Inquiry.objects.all()
-    return render(request, 'spotify_playlist/inquiries_index.html', {'inquiries': inquiries})
+def spotify_set_user(request):
+    code = request.GET.get('code')
+    token_info = sp.get_access_token(code)
+    access_token = token_info['access_token']
+
+    # Create or get the SpotifyUser
+    user, created = SpotifyUser.objects.get_or_create(access_token=access_token)
+
+    # Redirect to inquiries_index with the user's primary key as a parameter
+    return redirect('inquiries_index', user_pk=user.pk)
+
+def inquiries_index(request, user_pk):
+    user = get_object_or_404(SpotifyUser, pk=user_pk)
+    inquiries = Inquiry.objects.filter(spotify_user=user)
+    return render(request, 'spotify_playlist/inquiries_index.html', {'user': user, 'inquiries': inquiries})
 
 def inquiry_detail(request, pk):
     inquiry = get_object_or_404(Inquiry, pk=pk)
