@@ -6,11 +6,18 @@ from .models import Inquiry
 from .models import Song
 from django.utils import timezone
 from openai import OpenAI
+import spotipy
+from spotipy.oauth2 import SpotifyOAuth
 import ast
 
 client = OpenAI(
     api_key="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"
 )
+
+# Set up your Spotify app credentials
+SPOTIPY_CLIENT_ID = 'your-client-id'
+SPOTIPY_CLIENT_SECRET = 'your-client-secret'
+SPOTIPY_REDIRECT_URI = 'your-redirect-uri'
 
 def create_inquiry(request):
         if request.method == 'POST':
