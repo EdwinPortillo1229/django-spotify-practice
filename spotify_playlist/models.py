@@ -4,6 +4,9 @@ from django.db import models
 
 class SpotifyUser(models.Model):
     access_token = models.CharField(max_length=255)
+    spotify_id = models.CharField(max_length=255, null=True)
+    display_name = models.CharField(max_length=255, null=True)
+    email = models.CharField(max_length=255, null=True)
 
 class Inquiry(models.Model):
     artist1 = models.CharField(max_length=255)
