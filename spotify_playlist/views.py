@@ -23,6 +23,7 @@ sp = spotipy.SpotifyOAuth(client_id=SPOTIPY_CLIENT_ID, client_secret=SPOTIPY_CLI
 def search_for_song(song_title, artist_name, user):
     spot = spotipy.Spotify(auth=user.access_token)
     search_results = spot.search(q=f"track:{song_title} artist:{artist_name}", type='track', limit=1)
+    print(f"\n\nsearching for {song_title} by {artist_name}, this is search results: {search_results}\n\n")
     if search_results['tracks']['items']:
         return search_results['tracks']['items'][0]['uri']
     else:
@@ -107,7 +108,8 @@ def create_inquiry(request, user_pk):
                     f"Now chosen vibe is '{vibe}' and the three artists are '{artist1}', "
                     f"'{artist2}', and '{artist3}'. "
                     f"Don't just give me their most popular songs, and make sure they match the vibe of '{vibe}' "
-                    f"for the last time, please give me 15 songs in an array within a string. dont convert to json to anything. straight up array within a string so i can convert the string to array")
+                    f"for the last time, please give me 15 songs in an array within a string. "
+                    f"dont convert to json to anything. straight up array within a string so i can convert the string to array")
 
                 response = client.chat.completions.create(
                     messages=[
