@@ -1,4 +1,3 @@
-# views.py
 
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import InquiryForm
@@ -23,9 +22,9 @@ sp = spotipy.SpotifyOAuth(client_id=SPOTIPY_CLIENT_ID, client_secret=SPOTIPY_CLI
 
 def search_for_song(song_title, artist_name, user):
     spot = spotipy.Spotify(auth=user.access_token)
-    search_results = spot.search(q=f'track:{song_title} artist:{artist_name}', type='track', limit=1)
+    search_results = spot.search(q=f"track:{song_title} artist:{artist_name}", type='track', limit=1)
     if search_results['tracks']['items']:
-        return search_results['tracks']['items'][0]['id']
+        return search_results['tracks']['items'][0]['uri']
     else:
         return None
 
@@ -33,7 +32,7 @@ def create_the_playlist(songs_arr, user, vibe, artists):
     spot = spotipy.Spotify(auth=user.access_token)
     playlist_name = f"{artists[0]}, {artists[1]}, {artists[2]} - {vibe}"
     playlist_desc = "Django practice project."
-    user_id = user.id
+    user_id = user.spotify_id
     playlist = spot.user_playlist_create(user_id, playlist_name, public=True, description=playlist_desc)
     playlist_id = playlist['id']
     track_ids = []
@@ -123,7 +122,7 @@ def create_inquiry(request, user_pk):
                 data_str = generated_text.strip('"')
                 songs = ast.literal_eval(data_str)
 
-                playlist_creation_response = create_the_playlist(songs, user, vibe, [artist1, artist2, artist3])
+                create_the_playlist(songs, user, vibe, [artist1, artist2, artist3])
 
                 for song in songs:
                     song = Song(
