@@ -1,6 +1,6 @@
 # views.py
 
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .forms import InquiryForm
 from .models import Inquiry
 from django.utils import timezone
@@ -29,3 +29,7 @@ def create_inquiry(request):
 def inquiries_index(request):
     inquiries = Inquiry.objects.all()
     return render(request, 'spotify_playlist/inquiries_index.html', {'inquiries': inquiries})
+
+def inquiry_detail(request, pk):
+    inquiry = get_object_or_404(Inquiry, pk=pk)
+    return render(request, 'spotify_playlist/inquiry_detail.html', {'inquiry': inquiry})

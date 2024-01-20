@@ -2,7 +2,11 @@
 {% if inquiries %}
     <ul>
     {% for inquiry in inquiries %}
-        <li>{{inquiry.vibe}}: {{ inquiry.artist1 }}, {{ inquiry.artist2 }}, {{ inquiry.artist3 }}</li>
+        <li>
+            <a href="{% url 'inquiry_detail' inquiry.id %}">
+                {{inquiry.vibe}}: {{ inquiry.artist1 }}, {{ inquiry.artist2 }}, {{ inquiry.artist3 }}
+            </a>
+        </li>
     {% endfor %}
     </ul>
 {% else %}
