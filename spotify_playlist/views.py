@@ -19,6 +19,11 @@ SPOTIPY_CLIENT_ID = 'ddeddc01708d4387a7e10aff1a62b065'
 SPOTIPY_CLIENT_SECRET = '285a252875b8496bbd6664514aab9b60'
 SPOTIPY_REDIRECT_URI = 'http://127.0.0.1:8000/inquiries_index/'
 
+def connect_to_spotify(request):
+    sp = spotipy.SpotifyOAuth(client_id=SPOTIPY_CLIENT_ID, client_secret=SPOTIPY_CLIENT_SECRET, redirect_uri=SPOTIPY_REDIRECT_URI, scope="playlist-modify-public playlist-modify-private")
+    auth_url = sp.get_authorize_url()
+    return render(request, 'spotify_playlist/connect_to_spotify.html', {'auth_url': auth_url})
+
 def create_inquiry(request):
         if request.method == 'POST':
             form = InquiryForm(request.POST)
