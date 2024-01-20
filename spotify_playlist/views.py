@@ -20,11 +20,12 @@ def create_inquiry(request):
                 inquiry.save()
 
                 # Redirect to a success page or another view
-                return redirect('success_page')
+                return redirect('inquiries_index')
         else:
             form = InquiryForm()
 
         return render(request, 'spotify_playlist/create_inquiry.html', {'form': form})
 
-def success_page(request):
-    return render(request, 'spotify_playlist/success_page.html')
+def inquiries_index(request):
+    inquiries = Inquiry.objects.all()
+    return render(request, 'spotify_playlist/inquiries_index.html', {'inquiries': inquiries})

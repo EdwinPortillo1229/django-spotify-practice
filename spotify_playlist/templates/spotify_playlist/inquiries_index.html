@@ -1,0 +1,10 @@
+<h2>Past Iquiries</h2>
+{% if inquiries %}
+    <ul>
+    {% for inquiry in inquiries %}
+        <li>{{inquiry.vibe}}: {{ inquiry.artist1 }}, {{ inquiry.artist2 }}, {{ inquiry.artist3 }}</li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No inquiries have been made yet.</p>
+{% endif %}
