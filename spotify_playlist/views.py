@@ -1,14 +1,28 @@
+# views.py
+
 from django.shortcuts import render, redirect
 from .forms import InquiryForm
+from .models import Inquiry
 
 def create_inquiry(request):
-    if request.method == 'POST':
-        form = InquiryForm(request.POST)
-        if form.is_valid():
-            # Process the form data (save to the database, etc.)
-            # Redirect to a success page or another view
-            return redirect('success_page')
-    else:
-        form = InquiryForm()
+        if request.method == 'POST':
+            form = InquiryForm(request.POST)
+            if form.is_valid():
+                # Create an Inquiry instance using form data
+                inquiry = Inquiry(
+                    artist1=form.cleaned_data['artist1'],
+                    artist2=form.cleaned_data['artist2'],
+                    artist3=form.cleaned_data['artist3'],
+                    
+                )
+                inquiry.save()
 
-    return render(request, 'spotify_playlist/create_inquiry.html', {'form': form})
+                # Redirect to a success page or another view
+                return redirect('success_page')
+        else:
+            form = InquiryForm()
+
+        return render(request, 'spotify_playlist/create_inquiry.html', {'form': form})
+
+def success_page(request):
+    return render(request, 'success_page.html')

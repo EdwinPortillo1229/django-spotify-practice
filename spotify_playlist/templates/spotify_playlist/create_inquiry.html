@@ -1,5 +1,5 @@
 <h2>Create Inquiry</h2>
-<form method="post">
+<form method="post" action="{% url 'create_inquiry' %}">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit">Submit</button>
