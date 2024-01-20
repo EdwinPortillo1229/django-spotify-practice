@@ -16,8 +16,8 @@ client = OpenAI(
 )
 
 # Set up your Spotify app credentials
-SPOTIPY_CLIENT_ID = 'ddeddc01708d4387a7e10aff1a62b065'
-SPOTIPY_CLIENT_SECRET = '285a252875b8496bbd6664514aab9b60'
+SPOTIPY_CLIENT_ID = '3040ec93145a41f58a74663e82bf1015'
+SPOTIPY_CLIENT_SECRET = '6e176a0e9f4342d7aa9358d016111fa9'
 SPOTIPY_REDIRECT_URI = 'http://127.0.0.1:8000/spotify_set_user/'
 sp = spotipy.SpotifyOAuth(client_id=SPOTIPY_CLIENT_ID, client_secret=SPOTIPY_CLIENT_SECRET, redirect_uri=SPOTIPY_REDIRECT_URI, scope="playlist-modify-public playlist-modify-private")
 
@@ -26,7 +26,29 @@ def connect_to_spotify(request):
     auth_url = sp.get_authorize_url()
     return render(request, 'spotify_playlist/connect_to_spotify.html', {'auth_url': auth_url})
 
-def create_inquiry(request):
+def spotify_set_user(request):
+    code = request.GET.get('code')
+    token_info = sp.get_access_token(code)
+    access_token = token_info['access_token']
+    user_info = sp.me()
+
+    user, created = SpotifyUser.objects.get_or_create(
+        spotify_id=user_info['id'],
+        display_name=user_info['display_name'],
+        email=user_info['email'],
+    )
+    user.access_token = access_token
+    user.save()
+
+    # Redirect to inquiries_index with the user's primary key as a parameter
+    return redirect('inquiries_index', user_pk=user.pk)
+
+def inquiries_index(request, user_pk):
+    user = get_object_or_404(SpotifyUser, pk=user_pk)
+    inquiries = Inquiry.objects.filter(spotify_user=user)
+    return render(request, 'spotify_playlist/inquiries_index.html', {'user': user, 'inquiries': inquiries})
+
+def create_inquiry(request, user_pk):
         if request.method == 'POST':
             form = InquiryForm(request.POST)
             if form.is_valid():
@@ -35,12 +57,14 @@ def create_inquiry(request):
                 artist2 = form.cleaned_data['artist2']
                 artist3 = form.cleaned_data['artist3']
                 vibe = form.cleaned_data['vibe']
+                user = get_object_or_404(SpotifyUser, pk=user_pk)
                 inquiry = Inquiry(
                     artist1=artist1,
                     artist2=artist2,
                     artist3=artist3,
                     vibe=vibe,
-                    date_of_inquiry = timezone.now()
+                    date_of_inquiry = timezone.now(),
+                    spotify_user = user
                 )
                 inquiry.save()
                 prompt = (f"Listen. I need you to return something very specific to me, "
@@ -83,27 +107,11 @@ def create_inquiry(request):
                     )
                     song.save()
 
-                return redirect('inquiries_index')
+                return redirect('inquiries_index', user_pk=user_pk)
         else:
             form = InquiryForm()
 
-        return render(request, 'spotify_playlist/create_inquiry.html', {'form': form})
-
-def spotify_set_user(request):
-    code = request.GET.get('code')
-    token_info = sp.get_access_token(code)
-    access_token = token_info['access_token']
-
-    # Create or get the SpotifyUser
-    user, created = SpotifyUser.objects.get_or_create(access_token=access_token)
-
-    # Redirect to inquiries_index with the user's primary key as a parameter
-    return redirect('inquiries_index', user_pk=user.pk)
-
-def inquiries_index(request, user_pk):
-    user = get_object_or_404(SpotifyUser, pk=user_pk)
-    inquiries = Inquiry.objects.filter(spotify_user=user)
-    return render(request, 'spotify_playlist/inquiries_index.html', {'user': user, 'inquiries': inquiries})
+        return render(request, 'spotify_playlist/create_inquiry.html', {'form': form, 'user_pk': user_pk})
 
 def inquiry_detail(request, pk):
     inquiry = get_object_or_404(Inquiry, pk=pk)
