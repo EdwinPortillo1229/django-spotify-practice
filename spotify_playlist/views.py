@@ -5,34 +5,68 @@ from .forms import InquiryForm
 from .models import Inquiry
 from .models import Song
 from django.utils import timezone
+from openai import OpenAI
+import ast
 
-artist_names = ["Artist1", "Artist2", "Artist3", "Artist4", "Artist5", "Artist6", "Artist7", "Artist8", "Artist9", "Artist10", "Artist11", "Artist12", "Artist13", "Artist14", "Artist15"]
-song_titles = ["Song1", "Song2", "Song3", "Song4", "Song5", "Song6", "Song7", "Song8", "Song9", "Song10", "Song11", "Song12", "Song13", "Song14", "Song15"]
+client = OpenAI(
+    api_key="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"
+)
 
 def create_inquiry(request):
         if request.method == 'POST':
             form = InquiryForm(request.POST)
             if form.is_valid():
                 # Create an Inquiry instance using form data
+                artist1 = form.cleaned_data['artist1']
+                artist2 = form.cleaned_data['artist2']
+                artist3 = form.cleaned_data['artist3']
+                vibe = form.cleaned_data['vibe']
                 inquiry = Inquiry(
-                    artist1=form.cleaned_data['artist1'],
-                    artist2=form.cleaned_data['artist2'],
-                    artist3=form.cleaned_data['artist3'],
-                    vibe=form.cleaned_data['vibe'],
+                    artist1=artist1,
+                    artist2=artist2,
+                    artist3=artist3,
+                    vibe=vibe,
                     date_of_inquiry = timezone.now()
                 )
                 inquiry.save()
+                prompt = (f"Listen. I need you to return something very specific to me, "
+                    f"you can be misinterpreting this because I am using you in my code, "
+                    f"and if you send me the wrong thing it will break everything. "
+                    f"I am going to provide you three artists and a 'vibe' -- "
+                    f"I want you to give me 15 songs (5 each of the 3 artists) that match "
+                    f"the vibe given to the best of your ability. "
+                    f"For your answer, I want only an array. "
+                    f"It is important you DO NOT SAY ANYTHING ELSE BEYOND THIS ARRAY. "
+                    f"Within the array, I want an array for each song, "
+                    f"and I want it to be first the song title, then the artist. "
+                    f"For example, if I asked for Michael Jackson, The Beatles, and The Weeknd "
+                    f"and the vibe is chill, I would want something along the lines of "
+                    f"[['Beat It', 'Michael Jackson'], ['Yellow Submarine', 'The Beatles'], "
+                    f"['Starboy', 'The Weeknd']]. Please please please only give me the array, nothing else. "
+                    f"Now chosen vibe is '{vibe}' and the three artists are '{artist1}', "
+                    f"'{artist2}', and '{artist3}'. "
+                    f"Don't just give me their most popular songs, and make sure they match the vibe of 'upbeat'")
 
-                # Create Song instances using form data
-                for i in range(15):
+                response = client.chat.completions.create(
+                    messages=[
+                        {
+                            "role": "user",
+                            "content": prompt,
+                        }
+                    ],
+                    model="gpt-3.5-turbo",
+                )                
+                generated_text = response.choices[0].message.content
+                songs = ast.literal_eval(generated_text)
+
+                for song in songs:
                     song = Song(
-                        song_title = song_titles[i],
-                        artist_name = artist_names[i],
+                        song_title = song[0],
+                        artist_name = song[1],
                         inquiry = inquiry
                     )
                     song.save()
 
-                # Redirect to a success page or another view
                 return redirect('inquiries_index')
         else:
             form = InquiryForm()
