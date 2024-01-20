@@ -1,10 +1,9 @@
 <h2>Create Inquiry</h2>
-<form method="post" action="{% url 'create_inquiry' %}">
+<form method="post" action="{% url 'create_inquiry' user_pk=user.pk %}">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit">Submit</button>
 </form>
 
-<a href="{% url 'inquiries_index' %}">Go back</button>
-```
+<a href="{% url 'inquiries_index' user_pk=user.pk %}">Go back</button>
 

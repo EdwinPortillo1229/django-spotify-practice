@@ -50,6 +50,7 @@ def inquiries_index(request, user_pk):
     return render(request, 'spotify_playlist/inquiries_index.html', {'user': user, 'inquiries': inquiries})
 
 def create_inquiry(request, user_pk):
+        user = get_object_or_404(SpotifyUser, pk=user_pk)
         if request.method == 'POST':
             form = InquiryForm(request.POST)
             if form.is_valid():
@@ -58,7 +59,7 @@ def create_inquiry(request, user_pk):
                 artist2 = form.cleaned_data['artist2']
                 artist3 = form.cleaned_data['artist3']
                 vibe = form.cleaned_data['vibe']
-                user = get_object_or_404(SpotifyUser, pk=user_pk)
+                
                 inquiry = Inquiry(
                     artist1=artist1,
                     artist2=artist2,
@@ -112,7 +113,7 @@ def create_inquiry(request, user_pk):
         else:
             form = InquiryForm()
 
-        return render(request, 'spotify_playlist/create_inquiry.html', {'form': form, 'user_pk': user_pk})
+        return render(request, 'spotify_playlist/create_inquiry.html', {'form': form, 'user': user})
 
 def inquiry_detail(request, pk):
     inquiry = get_object_or_404(Inquiry, pk=pk)

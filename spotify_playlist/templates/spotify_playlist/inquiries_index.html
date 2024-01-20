@@ -1,4 +1,4 @@
-<h2>Past Inquiries for {{user.display_name}}</h2><a href="{% url 'create_inquiry' %}">Make a new one!</a>
+<h2>Past Inquiries for {{user.display_name}}</h2><a href="{% url 'create_inquiry' user_pk=user.pk %}">Make a new one!</a>
 {% if inquiries %}
     <ul>
     {% for inquiry in inquiries %}
