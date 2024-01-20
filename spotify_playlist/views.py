@@ -12,7 +12,7 @@ from spotipy.oauth2 import SpotifyOAuth
 import ast
 
 client = OpenAI(
-    api_key="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"
+    api_key="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"
 )
 
 # Set up your Spotify app credentials
@@ -115,7 +115,8 @@ def create_inquiry(request, user_pk):
 
         return render(request, 'spotify_playlist/create_inquiry.html', {'form': form, 'user': user})
 
-def inquiry_detail(request, pk):
+def inquiry_detail(request, user_pk, pk):
     inquiry = get_object_or_404(Inquiry, pk=pk)
+    user = get_object_or_404(SpotifyUser, pk=user_pk)
     songs = Song.objects.filter(inquiry=inquiry)
-    return render(request, 'spotify_playlist/inquiry_detail.html', {'inquiry': inquiry, 'songs': songs})
+    return render(request, 'spotify_playlist/inquiry_detail.html', {'inquiry': inquiry, 'songs': songs, 'user': user})

@@ -8,4 +8,4 @@
     <p>{{song.song_title}} by {{song.artist_name}}</p>
 {% endfor %}
 
-<a href="{% url 'inquiries_index' %}">Go back</button>
+<a href="{% url 'inquiries_index' user.id%}">Go back</button>

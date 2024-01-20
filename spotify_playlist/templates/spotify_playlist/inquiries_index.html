@@ -3,7 +3,7 @@
     <ul>
     {% for inquiry in inquiries %}
         <li>
-            <a href="{% url 'inquiry_detail' inquiry.id %}">
+            <a href="{% url 'inquiry_detail' user.id inquiry.id %}">
                 {{inquiry.vibe}}: {{ inquiry.artist1 }}, {{ inquiry.artist2 }}, {{ inquiry.artist3 }}
             </a>
         </li>
