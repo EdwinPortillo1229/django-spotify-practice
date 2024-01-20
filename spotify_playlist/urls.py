@@ -1,7 +1,9 @@
-from django.urls import path
+# spotify_playlist/urls.py
 
-from . import views
+from django.urls import path
+from .views import create_inquiry
 
 urlpatterns = [
-    path("", views.landing_page, name="landing page"),
+    # Other URL patterns
+    path('create_inquiry/', create_inquiry, name='create_inquiry'),
 ]

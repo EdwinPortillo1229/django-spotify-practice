@@ -1,7 +1,9 @@
+# spot_project/urls.py
+
 from django.contrib import admin
-from django.urls import include, path
+from django.urls import path, include
 
 urlpatterns = [
-    path("landing_page/", include("spotify_playlist.urls")),
-    path("admin/", admin.site.urls),
+    path('admin/', admin.site.urls),
+    path('spotify_playlist/', include('spotify_playlist.urls')),
 ]
