@@ -30,12 +30,13 @@ def spotify_set_user(request):
     code = request.GET.get('code')
     token_info = sp.get_access_token(code)
     access_token = token_info['access_token']
-    user_info = sp.me()
+    spot = spotipy.Spotify(auth=access_token)
+    user_info = spot.me()
+    print(user_info)
 
     user, created = SpotifyUser.objects.get_or_create(
         spotify_id=user_info['id'],
         display_name=user_info['display_name'],
-        email=user_info['email'],
     )
     user.access_token = access_token
     user.save()
