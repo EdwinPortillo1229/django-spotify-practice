@@ -15,9 +15,9 @@ client = OpenAI(
 )
 
 # Set up your Spotify app credentials
-SPOTIPY_CLIENT_ID = 'your-client-id'
-SPOTIPY_CLIENT_SECRET = 'your-client-secret'
-SPOTIPY_REDIRECT_URI = 'your-redirect-uri'
+SPOTIPY_CLIENT_ID = 'ddeddc01708d4387a7e10aff1a62b065'
+SPOTIPY_CLIENT_SECRET = '285a252875b8496bbd6664514aab9b60'
+SPOTIPY_REDIRECT_URI = 'http://127.0.0.1:8000/inquiries_index/'
 
 def create_inquiry(request):
         if request.method == 'POST':
