@@ -15,9 +15,9 @@ client = OpenAI(
 )
 
 # Set up your Spotify app credentials
-SPOTIPY_CLIENT_ID = '1827e80b9c3441e38e2eba9929146718'
-SPOTIPY_CLIENT_SECRET = '0fbe3af26f9b4b66985339c98c6e5abe'
-SPOTIPY_REDIRECT_URI = 'http://127.0.0.1:8000/spotify_set_user'
+SPOTIPY_CLIENT_ID = '8ce21599db1a4e4bbe04f8c45f598fe4'
+SPOTIPY_CLIENT_SECRET = '9fd1b383181d49d59355776a53d5db28'
+SPOTIPY_REDIRECT_URI = 'http://127.0.0.1:8000/spotify_set_user/'
 sp = spotipy.SpotifyOAuth(client_id=SPOTIPY_CLIENT_ID, client_secret=SPOTIPY_CLIENT_SECRET, redirect_uri=SPOTIPY_REDIRECT_URI, scope="playlist-modify-public playlist-modify-private")
 
 def search_for_song(song_title, artist_name, user):
