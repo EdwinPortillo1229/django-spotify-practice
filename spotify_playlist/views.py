@@ -1,13 +1,10 @@
 
+import requests
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import InquiryForm
-from .models import Inquiry
-from .models import Song
-from .models import SpotifyUser
+from .models import Inquiry, Song, SpotifyUser
 from django.utils import timezone
 from openai import OpenAI
-import spotipy
-from spotipy.oauth2 import SpotifyOAuth
 import ast
 
 client = OpenAI(
@@ -15,57 +12,85 @@ client = OpenAI(
 )
 
 # Set up your Spotify app credentials
-SPOTIPY_CLIENT_ID = '8ce21599db1a4e4bbe04f8c45f598fe4'
-SPOTIPY_CLIENT_SECRET = '9fd1b383181d49d59355776a53d5db28'
+SPOTIPY_CLIENT_ID = 'edb9962744cb4fb8abb45296c550e7b1'
+SPOTIPY_CLIENT_SECRET = '4d03087a56474108a5d7030d4e6ece8d'
 SPOTIPY_REDIRECT_URI = 'http://127.0.0.1:8000/spotify_set_user/'
-sp = spotipy.SpotifyOAuth(client_id=SPOTIPY_CLIENT_ID, client_secret=SPOTIPY_CLIENT_SECRET, redirect_uri=SPOTIPY_REDIRECT_URI, scope="playlist-modify-public playlist-modify-private")
 
-def search_for_song(song_title, artist_name, user):
-    spot = spotipy.Spotify(auth=user.access_token)
-    search_results = spot.search(q=f"track:{song_title} artist:{artist_name}", type='track', limit=1)
-    if search_results['tracks']['items']:
-        return search_results['tracks']['items'][0]['uri']
+def search_for_song(song_title, artist_name, access_token):
+    headers = {
+        'Authorization': f'Bearer {access_token}',
+    }
+    params = {
+        'q': f"track:{song_title} artist:{artist_name}",
+        'type': 'track',
+        'limit': 1,
+    }
+    response = requests.get('https://api.spotify.com/v1/search', headers=headers, params=params)
+    data = response.json()
+    if 'items' in data.get('tracks', {}):
+        return data['tracks']['items'][0]['uri']
     else:
         return None
 
-def create_the_playlist(songs_arr, user, vibe, artists):
-    spot = spotipy.Spotify(auth=user.access_token)
+def create_the_playlist(songs_arr, access_token, vibe, artists):
+    headers = {
+        'Authorization': f'Bearer {access_token}',
+        'Content-Type': 'application/json',
+    }
     playlist_name = f"{artists[0]}, {artists[1]}, {artists[2]} - {vibe}"
     playlist_desc = "Django practice project."
-    user_id = user.spotify_id
-    playlist = spot.user_playlist_create(user_id, playlist_name, public=True, description=playlist_desc)
-    playlist_id = playlist['id']
+    user_id = SpotifyUser.objects.get(access_token=access_token).spotify_id
+
+    playlist_data = {
+        'name': playlist_name,
+        'public': True,
+        'description': playlist_desc,
+    }
+
+    response = requests.post(f'https://api.spotify.com/v1/users/{user_id}/playlists', headers=headers, json=playlist_data)
+    playlist_id = response.json().get('id', '')
+    
     track_ids = []
     successful_songs = []
+
     for song in songs_arr:
-        track_id = search_for_song(song[0], song[1], user)
+        track_id = search_for_song(song[0], song[1], access_token)
         if track_id:
             track_ids.append(track_id)
             successful_songs.append(song)
-    spot.user_playlist_add_tracks(user_id, playlist_id, track_ids)
+
+    requests.post(f'https://api.spotify.com/v1/users/{user_id}/playlists/{playlist_id}/tracks', headers=headers, json={'uris': track_ids})
+    
     return successful_songs
 
-
 def connect_to_spotify(request):
-    auth_url = sp.get_authorize_url()
+    auth_url = f"https://accounts.spotify.com/authorize?client_id={SPOTIPY_CLIENT_ID}&response_type=code&redirect_uri={SPOTIPY_REDIRECT_URI}&scope=playlist-modify-public%20playlist-modify-private&state=123"
     return render(request, 'spotify_playlist/connect_to_spotify.html', {'auth_url': auth_url})
 
 def spotify_set_user(request):
     code = request.GET.get('code')
-    token_info = sp.get_access_token(code)
-    access_token = token_info['access_token']
-    spot = spotipy.Spotify(auth=access_token)
-    user_info = spot.me()
+    token_info = requests.post('https://accounts.spotify.com/api/token', data={
+        'grant_type': 'authorization_code',
+        'code': code,
+        'redirect_uri': SPOTIPY_REDIRECT_URI,
+        'client_id': SPOTIPY_CLIENT_ID,
+        'client_secret': SPOTIPY_CLIENT_SECRET,
+    }).json()
 
-    user, created = SpotifyUser.objects.get_or_create(
-        spotify_id=user_info['id'],
-        display_name=user_info['display_name'],
-    )
-    user.access_token = access_token
-    user.save()
-
-    # Redirect to inquiries_index with the user's primary key as a parameter
-    return redirect('inquiries_index', user_pk=user.pk)
+    access_token = token_info.get('access_token', '')
+    
+    if access_token:
+        user_info = requests.get('https://api.spotify.com/v1/me', headers={'Authorization': f'Bearer {access_token}'}).json()
+        user, created = SpotifyUser.objects.get_or_create(
+            spotify_id=user_info['id'],
+            display_name=user_info['display_name'],
+        )
+        user.access_token = access_token
+        user.save()
+        return redirect('inquiries_index', user_pk=user.pk)
+    else:
+        # Handle error case
+        return render(request, 'error_page.html', {'error_message': 'Failed to authenticate with Spotify'})
 
 def inquiries_index(request, user_pk):
     user = get_object_or_404(SpotifyUser, pk=user_pk)
