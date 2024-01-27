@@ -138,6 +138,8 @@ def create_inquiry(request, user_pk):
                     f"dont convert to json to anything. straight up array within a string so i can convert the string to array"
                     f"no matter what. do not reply with anything else. just the array. "
                     f"keep in mind i will be using ast.literal_eval(data_str) to deconstruct it"
+                    f"give me a response where it wont error out using that logic. please."
+                    f"especial keep this in mind for songs that have appostrophes in them. "
                     )
 
                 response = client.chat.completions.create(
@@ -153,18 +155,19 @@ def create_inquiry(request, user_pk):
                 print(f"\n\n\n this is the generate text{generated_text} \n\n\n")
                 data_str = generated_text.strip('"')
                 songs = ast.literal_eval(data_str)
+                print(f"\n\n\n this is the songs {songs} \n\n\n")
 
                 successful_songs = create_the_playlist(songs, user.access_token, vibe, [artist1, artist2, artist3])
 
-                for song in successful_songs:
-                    song = Song(
-                        song_title = song[0],
-                        artist_name = song[1],
-                        inquiry = inquiry
-                    )
-                    song.save()
+                # for song in successful_songs:
+                #     song = Song(
+                #         song_title = song[0],
+                #         artist_name = song[1],
+                #         inquiry = inquiry
+                #     )
+                #     song.save()
 
-                return redirect('inquiries_index', user_pk=user_pk)
+                # return redirect('inquiries_index', user_pk=user_pk)
         else:
             form = InquiryForm()
 
