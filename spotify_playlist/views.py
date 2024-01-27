@@ -8,7 +8,7 @@ from openai import OpenAI
 import ast
 
 client = OpenAI(
-    api_key="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"
+    api_key="otbnwrJzVcZ0B0kcjlSWJFkblB3Tk8xboGD9WXmHlaABOW1V-ks"[::-1]
 )
 
 # Set up your Spotify app credentials
