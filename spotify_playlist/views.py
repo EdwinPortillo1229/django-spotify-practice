@@ -27,7 +27,7 @@ def search_for_song(song_title, artist_name, access_token):
     }
     response = requests.get('https://api.spotify.com/v1/search', headers=headers, params=params)
     data = response.json()
-    if 'items' in data.get('tracks', {}):
+    if 'items' in data.get('tracks', {}) and data['tracks']['items']:
         return data['tracks']['items'][0]['uri']
     else:
         return None
@@ -117,30 +117,18 @@ def create_inquiry(request, user_pk):
                     spotify_user = user
                 )
                 inquiry.save()
-                prompt = (f"Listen. I need you to return something very specific to me, "
-                    f"you can be misinterpreting this because I am using you in my code, "
-                    f"and if you send me the wrong thing it will break everything. "
-                    f"I am going to provide you three artists and a 'vibe' -- "
-                    f"I want you to give me 15 songs (5 each of the 3 artists) that match "
-                    f"the vibe given to the best of your ability. "
-                    f"For your answer, I want only an array. "
-                    f"It is important you DO NOT SAY ANYTHING ELSE BEYOND THIS ARRAY. "
-                    f"Within the array, I want an array for each song, "
-                    f"and I want it to be first the song title, then the artist. "
-                    f"For example, if I asked for Michael Jackson, The Beatles, and The Weeknd "
-                    f"and the vibe is chill, I would want something along the lines of "
-                    f"[['Beat It', 'Michael Jackson'], ['Yellow Submarine', 'The Beatles'], "
-                    f"['Starboy', 'The Weeknd']]. Please please please only give me the array, nothing else. "
-                    f"Now chosen vibe is '{vibe}' and the three artists are '{artist1}', "
-                    f"'{artist2}', and '{artist3}'. "
-                    f"Don't just give me their most popular songs, and make sure they match the vibe of '{vibe}' "
-                    f"for the last time, please give me 15 songs in an array within a string. "
-                    f"dont convert to json to anything. straight up array within a string so i can convert the string to array"
-                    f"no matter what. do not reply with anything else. just the array. "
-                    f"keep in mind i will be using ast.literal_eval(data_str) to deconstruct it"
-                    f"give me a response where it wont error out using that logic. please."
-                    f"especial keep this in mind for songs that have appostrophes in them. "
-                    )
+                prompt = (
+                    f"I need you to provide 15 songs for a playlist. "
+                    f"I'll give you three artists and a 'vibe'. "
+                    f"Your response should be an array with 15 subarrays, each containing a song title and artist. "
+                    f"For example: [['Song1', 'Artist1'], ['Song2', 'Artist2'], ...]. "
+                    f"Please avoid using double quotes within song titles or artist names. "
+                    f"If a song title or artist contains an apostrophe, use a backslash before it. "
+                    f"Now, the chosen vibe is '{vibe}' and the three artists are '{artist1}', '{artist2}', and '{artist3}'. "
+                    f"Ensure the response is formatted as specified, and I'll be using ast.literal_eval to process it."
+                )
+
+
 
                 response = client.chat.completions.create(
                     messages=[
@@ -159,15 +147,15 @@ def create_inquiry(request, user_pk):
 
                 successful_songs = create_the_playlist(songs, user.access_token, vibe, [artist1, artist2, artist3])
 
-                # for song in successful_songs:
-                #     song = Song(
-                #         song_title = song[0],
-                #         artist_name = song[1],
-                #         inquiry = inquiry
-                #     )
-                #     song.save()
+                for song in successful_songs:
+                    song = Song(
+                        song_title = song[0],
+                        artist_name = song[1],
+                        inquiry = inquiry
+                    )
+                    song.save()
 
-                # return redirect('inquiries_index', user_pk=user_pk)
+                return redirect('inquiries_index', user_pk=user_pk)
         else:
             form = InquiryForm()
 
