@@ -8,7 +8,7 @@ from openai import OpenAI
 import ast
 
 client = OpenAI(
-    api_key="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"
+    api_key="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"
 )
 
 # Set up your Spotify app credentials
@@ -136,7 +136,9 @@ def create_inquiry(request, user_pk):
                     f"Don't just give me their most popular songs, and make sure they match the vibe of '{vibe}' "
                     f"for the last time, please give me 15 songs in an array within a string. "
                     f"dont convert to json to anything. straight up array within a string so i can convert the string to array"
-                    f"no matter what. do not reply with anything else. just the array. ")
+                    f"no matter what. do not reply with anything else. just the array. "
+                    f"keep in mind i will be using ast.literal_eval(data_str) to deconstruct it"
+                    )
 
                 response = client.chat.completions.create(
                     messages=[
@@ -152,7 +154,7 @@ def create_inquiry(request, user_pk):
                 data_str = generated_text.strip('"')
                 songs = ast.literal_eval(data_str)
 
-                successful_songs = create_the_playlist(songs, user, vibe, [artist1, artist2, artist3])
+                successful_songs = create_the_playlist(songs, user.access_token, vibe, [artist1, artist2, artist3])
 
                 for song in successful_songs:
                     song = Song(
