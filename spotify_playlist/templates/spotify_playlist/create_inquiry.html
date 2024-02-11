@@ -13,7 +13,7 @@
             {% csrf_token %}
             {{ form.as_p }}
             <a class="button" href="{% url 'inquiries_index' user_pk=user.pk %}">Go back</a>
-            <button class="button" type="submit">Submit</button>
+            <button class="button" id="submit-button" type="submit">Submit</button>
         </form>
 
         
