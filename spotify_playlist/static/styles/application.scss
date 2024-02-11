@@ -3,16 +3,37 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh; 
-    background-color: #edca82;
+    background-color: #cbd18f;
+    color: white;
 }
 
 .main-elems {
     justify-content: center;
     align-items: center;
     text-align: center;
-    border: 5px solid #a9c0a6;
+    border: 5px solid #2b4f27;
+    background-color: #3a6b35;
     padding: 20px;
     border-radius: 15px;
     width: 75%;
     margin-top: -25vh; /* Move the div one-fourth down the screen */
+}
+
+.button{
+    background-color: #cbd18f;
+    border: 3px solid #2b4f27;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 12px;
+}
+
+.button:hover {
+    background-color: #2b4f27;
+    color: white;
 }
