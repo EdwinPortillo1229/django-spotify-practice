@@ -31,6 +31,12 @@ body {
     border-radius: 12px;
 }
 
+.button.disabled{
+    background-color: #626262;
+    border: 3px solid #323232;
+    color: #b8b8b8;
+}
+
 .button:hover {
     background-color: #2b4f27;
     color: white;
