@@ -2,7 +2,6 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh; 
     background-color: #cbd18f;
     color: white;
 }
@@ -57,4 +56,8 @@ ul {
 .inquiries-elem-link:hover {
     background-color: #2b4f27;
     color: white;
+}
+
+.gen-div {
+    margin-bottom: 20px;
 }

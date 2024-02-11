@@ -1,11 +1,27 @@
-<h2> {{inquiry.vibe}} ({{inquiry.date_of_inquiry}})</h2>
-<p> Artist 1: {{inquiry.artist1}}</p>
-<p> Artist 2: {{inquiry.artist2}}</p>
-<p> Artist 3: {{inquiry.artist3}}</p>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Title</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'styles/application.scss' %}">
+</head>
+<body>
+    <div class="main-elems">
+        <div class="gen-div">
+            <h2> {{inquiry.vibe}} ({{inquiry.date_of_inquiry}})</h2>
+            <p> Artist 1: {{inquiry.artist1}}</p>
+            <p> Artist 2: {{inquiry.artist2}}</p>
+            <p> Artist 3: {{inquiry.artist3}}</p>
+        </div>
 
-<h3>Songs:</h3>
-{% for song in songs %}
-    <p>{{song.song_title}} by {{song.artist_name}}</p>
-{% endfor %}
+        <div class="gen-div">
+            <h3>Songs:</h3>
+            {% for song in songs %}
+                <p>{{song.song_title}} by {{song.artist_name}}</p>
+            {% endfor %}
 
-<a href="{% url 'inquiries_index' user.id%}">Go back</button>
+            <a class="button" href="{% url 'inquiries_index' user.id%}">Go back</a>
+        </div>
+    </div>
+</body>
