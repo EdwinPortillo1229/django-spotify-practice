@@ -1,2 +1,14 @@
-<h2>Please click below to give us access to your spotify</h2>
-<a href="{{auth_url}}">Connect to Spotify</a>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Title</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'styles/connect_to_spotify.css' %}">
+</head>
+<body>
+    <h2>Please click below to give us access to your spotify</h2>
+    <a href="{{auth_url}}">Connect to Spotify</a>
+
+    <script src="{% static 'javascript/connect_to_spotify.js' %}"></script>
+</body>
