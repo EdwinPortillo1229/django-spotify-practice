@@ -16,7 +16,6 @@ body {
     padding: 20px;
     border-radius: 15px;
     width: 75%;
-    margin-top: -25vh; /* Move the div one-fourth down the screen */
 }
 
 .button{
@@ -34,6 +33,28 @@ body {
 }
 
 .button:hover {
+    background-color: #2b4f27;
+    color: white;
+}
+
+ul {
+    padding: 0;
+    list-style-type: none; 
+}
+
+.inquiries-elem {
+    margin-bottom: 20px;
+}
+
+.inquiries-elem-link {
+    color: white;
+    background-color: #e3b448;
+    padding: 5px;
+    border-radius: 10px;
+    text-decoration: none;
+}
+
+.inquiries-elem-link:hover {
     background-color: #2b4f27;
     color: white;
 }

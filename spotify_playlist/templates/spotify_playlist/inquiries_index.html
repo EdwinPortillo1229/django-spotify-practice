@@ -1,14 +1,29 @@
-<h2>Past Inquiries for {{user.display_name}}</h2><a href="{% url 'create_inquiry' user_pk=user.pk %}">Make a new one!</a>
-{% if inquiries %}
-    <ul>
-    {% for inquiry in inquiries %}
-        <li>
-            <a href="{% url 'inquiry_detail' user.id inquiry.id %}">
-                {{inquiry.vibe}}: {{ inquiry.artist1 }}, {{ inquiry.artist2 }}, {{ inquiry.artist3 }}
-            </a>
-        </li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>No inquiries have been made yet.</p>
-{% endif %}
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Title</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'styles/application.scss' %}">
+</head>
+<body>
+    <div class="main-elems">
+        <h2>Past Inquiries for {{user.display_name}}</h2>
+        <a class='button' href="{% url 'create_inquiry' user_pk=user.pk %}">Make a new one!</a>
+        {% if inquiries %}
+            <ul>
+            {% for inquiry in inquiries %}
+                <li class="inquiries-elem">
+                    <a class="inquiries-elem-link" href="{% url 'inquiry_detail' user.id inquiry.id %}">
+                        {{inquiry.vibe}}: {{ inquiry.artist1 }}, {{ inquiry.artist2 }}, {{ inquiry.artist3 }}
+                    </a>
+                </li>
+            {% endfor %}
+            </ul>
+        {% else %}
+            <p>No inquiries have been made yet.</p>
+        {% endif %}
+    </div>
+
+    <script src="{% static 'javascript/inquiries_index.js' %}"></script>
+</body>
