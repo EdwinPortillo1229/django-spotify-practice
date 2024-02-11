@@ -36,6 +36,22 @@ body {
     color: white;
 }
 
+label{
+    font-size: 20px;
+}
+
+input[type=text] {
+    width: 50%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    box-sizing: border-box;
+    background-color: #2b4f27;
+    border: 2px solid #cbd18f;
+}
+
 ul {
     padding: 0;
     list-style-type: none; 

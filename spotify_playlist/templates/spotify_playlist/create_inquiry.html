@@ -1,9 +1,24 @@
-<h2>Create Inquiry</h2>
-<form method="post" action="{% url 'create_inquiry' user_pk=user.pk %}">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Submit</button>
-</form>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Title</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'styles/application.scss' %}">
+</head>
+<body>
+    <div class="main-elems">
+        <h2>Create Inquiry</h2>
+        <form method="post" action="{% url 'create_inquiry' user_pk=user.pk %}">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <a class="button" href="{% url 'inquiries_index' user_pk=user.pk %}">Go back</a>
+            <button class="button" type="submit">Submit</button>
+        </form>
 
-<a href="{% url 'inquiries_index' user_pk=user.pk %}">Go back</button>
+        
+    </div>
+
+    <script src="{% static 'javascript/create_inquiry.js' %}"></script>
+</body>
 
