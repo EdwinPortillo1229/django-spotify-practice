@@ -8,7 +8,7 @@ from openai import OpenAI
 import ast
 
 client = OpenAI(
-    api_key="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"
+    api_key="null" ## replace when needed
 )
 
 # Set up your Spotify app credentials
@@ -126,6 +126,7 @@ def create_inquiry(request, user_pk):
                     f"If a song title or artist contains an apostrophe, use a backslash before it. "
                     f"Now, the chosen vibe is '{vibe}' and the three artists are '{artist1}', '{artist2}', and '{artist3}'. "
                     f"Ensure the response is formatted as specified, and I'll be using ast.literal_eval to process it."
+                    f"give me only the array, dont say one other work or add anything extra. that will mess things up"
                 )
 
 
@@ -137,13 +138,12 @@ def create_inquiry(request, user_pk):
                             "content": prompt,
                         }
                     ],
-                    model="gpt-4",
+                    model="gpt-4-turbo-preview",
                 )                
                 generated_text = response.choices[0].message.content
                 print(f"\n\n\n this is the generate text{generated_text} \n\n\n")
                 data_str = generated_text.strip('"')
                 songs = ast.literal_eval(data_str)
-                print(f"\n\n\n this is the songs {songs} \n\n\n")
 
                 successful_songs = create_the_playlist(songs, user.access_token, vibe, [artist1, artist2, artist3])
 
