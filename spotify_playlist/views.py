@@ -1,5 +1,6 @@
-
 import requests
+import os
+
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import InquiryForm
 from .models import Inquiry, Song, SpotifyUser
@@ -8,13 +9,13 @@ from openai import OpenAI
 import ast
 
 client = OpenAI(
-    api_key="null" ## replace when needed
+    api_key=os.getenv('OPENAI_API_KEY') ## replace when needed
 )
 
 # Set up your Spotify app credentials
-SPOTIPY_CLIENT_ID = 'edb9962744cb4fb8abb45296c550e7b1'
-SPOTIPY_CLIENT_SECRET = '4d03087a56474108a5d7030d4e6ece8d'
-SPOTIPY_REDIRECT_URI = 'http://127.0.0.1:8000/spotify_set_user/'
+SPOTIPY_CLIENT_ID = os.getenv('SPOTIPY_CLIENT_ID')
+SPOTIPY_CLIENT_SECRET = os.getenv('SPOTIPY_CLIENT_SECRET')
+SPOTIPY_REDIRECT_URI = os.getenv('SPOTIPY_REDIRECT_URI')
 
 def search_for_song(song_title, artist_name, access_token):
     headers = {
